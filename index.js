@@ -32,33 +32,26 @@ const promptUser = () => {
         //             name: "id",
         //             message: "What is your employee ID number?",
         //         },
-        //         {
-        //             type: "input",
-        //             name: "email",
-        //             message: "What is your email address?",
-        //         },
-        //         {
-        //             type: "input",
-        //             name: "officeNumber",
-        //             message: "What is your office number?",
-        //         },
-        //         {
-        //             type: "validate",
-        //             name: "addEmployee",
-        //             message: "Would you like to add another employee??",
-        //         },
-        //         // pushing all the information to the constructor
+        //        
     ]).then(response => {
         if (response.action === "View all employees") {
             allEmployees();
-        } else (response.action === "View all employees by department"){
+        } else if (response.action === "View all employees by department") {
             employeesByDepartment();
+        } else if (response.action === "View all employees by manager") {
+            employeesByManager();
+        } else if (response.action === "View all employees by manager") {
+            employeesByManager();
+        } else if (response.action === "Add employee") {
+            addEmployee();
+        } else if (response.action === "Remove employee") {
+            removeEmployee();
+        } else if (response.action === "Update employee role") {
+            updateEmployee();
+        } else if (response.action === "Update employee manager") {
+            updateManager();
         }
-
-
-
     })
-
 };
 
 allEmployees = () => {
@@ -69,7 +62,18 @@ allEmployees = () => {
     });
 };
 employeesByDepartment = () => {
-
+    connection.query("SELECT * FROM department", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        connection.end();
+    });
+}
+employeesByManager = () => {
+    connection.query("SELECT * FROM manager", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        connection.end();
+    });
 }
 
 promptUser();
