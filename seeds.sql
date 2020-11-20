@@ -1,19 +1,34 @@
-* **department**:
+DROP DATABASE IF EXISTS employees_db;
+CREATE DATABASE employees_db;
+USE employees_db;
+CREATE TABLE department (
+  id INT NOT NULL AUTO_INCREMENT,
+  department_name VARCHAR(30) NULL,
+  PRIMARY KEY (id)
+);
+CREATE TABLE role (
+  id INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(30) NULL,
+  salary DECIMAL(10,4) NULL,
+  department_id INT,
+  PRIMARY KEY (id)
+);
+CREATE TABLE employee (
+  id INT NOT NULL AUTO_INCREMENT,
+  first_name VARCHAR(30),
+  last_name VARCHAR(30),
+  role_id INT,
+  manager_id INT,
+  PRIMARY KEY (id)
+);
 
-  * **id** - INT PRIMARY KEY
-  * **name** - VARCHAR(30) to hold department name
+SELECT * FROM department;
+SELECT * FROM role;
+SELECT * FROM employee;
 
-* **role**:
-
-  * **id** - INT PRIMARY KEY
-  * **title** -  VARCHAR(30) to hold role title
-  * **salary** -  DECIMAL to hold role salary
-  * **department_id** -  INT to hold reference to department role belongs to
-
-* **employee**:
-
-  * **id** - INT PRIMARY KEY
-  * **first_name** - VARCHAR(30) to hold employee first name
-  * **last_name** - VARCHAR(30) to hold employee last name
-  * **role_id** - INT to hold reference to role employee has
-  * **manager_id** - INT to hold reference to another employee that manages the employee being Created. This field may be null if the employee has no manager
+INSERT INTO department(department_name)
+VALUES("sales");
+INSERT INTO role(title, salary, department_id)
+VALUES("associate", "55000", "22");
+INSERT INTO employee(first_name, last_name, role_id, manager_id)
+VALUES("John", "Smith", "44", "12");
