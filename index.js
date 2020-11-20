@@ -40,8 +40,6 @@ const promptUser = () => {
             employeesByDepartment();
         } else if (response.action === "View all employees by manager") {
             employeesByManager();
-        } else if (response.action === "View all employees by manager") {
-            employeesByManager();
         } else if (response.action === "Add employee") {
             addEmployee();
         } else if (response.action === "Remove employee") {
@@ -75,5 +73,59 @@ employeesByManager = () => {
         connection.end();
     });
 }
+
+const addEmployee = () => {
+    return inquirer.prompt([
+        {
+            type: "input",
+            name: "first_name",
+            message: "What is the employee's first name?",
+        },
+        {
+            type: "input",
+            name: "last_name",
+            message: "What is the employee's last name?",
+        },
+        {
+            type: "input",
+            name: "last_name",
+            message: "What is the employee's last name?",
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is the employee's role?",
+            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead",]
+        },
+        {
+            type: "list",
+            name: "manager",
+            message: "What is the employee's manager?",
+            choices: ["", "", "", "", "", "", ""]
+        },
+        {
+            type: "number",
+            name: "salary",
+            message: "What is the employee's salary?",
+        }
+    ]).then(response) = {
+        // write to ???  MySQL table???
+    }
+};
+
+removeEmployee = () => {
+    return inquirer.prompt([
+        {
+            type: "list",
+            name: "removeEmployee",
+            message: "Which employee would you like to remove?",
+            choices: ["", "", "", ""]
+        },
+    ]).then
+    // write prompt to remove employee
+}
+
+updateEmployee = () => { }
+updateManager = () => { }
 
 promptUser();
