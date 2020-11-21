@@ -25,7 +25,7 @@ const promptUser = () => {
             type: "list",
             name: "action",
             message: "What would you like to do?",
-            choices: ["View all employees", "View all employees by department", "View all employees by manager", "Add employee", "Remove employee", "Update employee role", "Update employee manager"]
+            choices: ["View all employees", "View all employees by department", "View all employees by manager", "Add employee", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
         }
         //         {
         //             type: "number",
@@ -48,33 +48,39 @@ const promptUser = () => {
             updateEmployee();
         } else if (response.action === "Update employee manager") {
             updateManager();
+        } else if (response.action === "Exit") {
+            exit();
         }
     })
 };
 
 allEmployees = () => {
+    console.log("View all employees.")
     connection.query("SELECT * FROM employee", (err, res) => {
         if (err) throw err;
         console.table(res);
-        connection.end();
+        // connection.end();
     });
 };
 employeesByDepartment = () => {
+    console.log("View all employees by department.")
     connection.query("SELECT * FROM department", (err, res) => {
         if (err) throw err;
         console.table(res);
-        connection.end();
+        // connection.end();
     });
 }
 employeesByManager = () => {
+    console.log("View all employees by manager.")
     connection.query("SELECT * FROM manager", (err, res) => {
         if (err) throw err;
         console.table(res);
-        connection.end();
+        // connection.end();
     });
 }
 
 const addEmployee = () => {
+    console.log("Adding a new employee.")
     return inquirer.prompt([
         {
             type: "input",
@@ -100,7 +106,7 @@ const addEmployee = () => {
         {
             type: "list",
             name: "manager",
-            message: "What is the employee's manager?",
+            message: "Who is the employee's manager?",
             choices: ["", "", "", "", "", "", ""]
         },
         {
@@ -114,6 +120,7 @@ const addEmployee = () => {
 };
 
 removeEmployee = () => {
+    console.log("Remove an employee.")
     return inquirer.prompt([
         {
             type: "list",
@@ -125,7 +132,15 @@ removeEmployee = () => {
     // write prompt to remove employee
 }
 
-updateEmployee = () => { }
-updateManager = () => { }
+updateEmployee = () => {
+    console.log("Update the employee information")
+}
+updateManager = () => {
+    console.log("Update the employee's manager information.")
+}
+exit = () => {
+    console.log("Exiting the application.")
+    connection.end();
+}
 
 promptUser();
