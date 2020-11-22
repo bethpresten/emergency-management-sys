@@ -54,25 +54,7 @@ const promptUser = () => {
                 exit();
                 break;
         }
-        // if (response.action === "View all employees") {
-        //     allEmployees();
-        // } else if (response.action === "View all employees by department") {
-        //     employeesByDepartment();
-        // } else if (response.action === "View all employees by manager") {
-        //     employeesByManager();
-        // } else if (response.action === "Add employee") {
-        //     addEmployee();
-        // } else if (response.action === "Remove employee") {
-        //     removeEmployee();
-        // } else if (response.action === "Update employee role") {
-        //     updateEmployee();
-        // } else if (response.action === "Update employee manager") {
-        //     updateManager();
-        // } else if (response.action === "Exit") {
-        //     exit();
-        // }
     })
-
 };
 
 allEmployees = () => {
@@ -81,6 +63,7 @@ allEmployees = () => {
         if (err) throw err;
         console.table(res);
         // connection.end();
+        promptUser();
     });
 };
 
@@ -90,16 +73,18 @@ employeesByDepartment = () => {
         if (err) throw err;
         console.table(res);
         // connection.end();
+        promptUser();
     });
-}
+};
 employeesByManager = () => {
     console.log("View all employees by manager.")
     connection.query("SELECT * FROM manager", (err, res) => {
         if (err) throw err;
         console.table(res);
         // connection.end();
+        promptUser();
     });
-}
+};
 
 const addEmployee = () => {
     console.log("Adding a new employee.")
@@ -123,7 +108,7 @@ const addEmployee = () => {
             type: "list",
             name: "role",
             message: "What is the employee's role?",
-            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead",]
+            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"]
         },
         {
             type: "list",
@@ -137,12 +122,12 @@ const addEmployee = () => {
             message: "What is the employee's salary?",
         }
     ]).then((response) => {
-        console.log(response)
+        console.log(response);
         // connection.query("INSERT INTO employees SET ?", response, function (err, res) {
         //     if (err) throw err;
         //     console.log(res.affectedRows + " as a new employee!\n")
         // })
-        connection.end();
+        promptUser();
     });
 };
 
@@ -155,37 +140,61 @@ removeEmployee = () => {
             message: "Which employee would you like to remove?",
             choices: ["", "", "", ""]
         },
-    ]).then
-    // write prompt to delete employee
-}
+    ]).then((response) => {
+        console.log(response);
+    });
+};
+// write prompt to delete employee
+
 
 updateEmployee = () => {
     console.log("Update the employee information")
-    // update query
+    return inquirer.prompt([
+        {
+            type: "list",
+            name: "updateEmployeeRole",
+            message: "Which employee do you want to update their role?",
+            choices: ["", "", "", ""]
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is the employee's role?",
+            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"]
+        },
+    ]).then((response) => {
+        console.log(response);
+        // update query
+
+        promptUser();
+
+    })
 }
+
 updateManager = () => {
     console.log("Update the employee's manager information.")
-    //update query
+    return inquirer.prompt([
+        {
+            type: "list",
+            name: "updateManager",
+            message: "Which employee do you want to update manager information?",
+            choices: ["", "", "", ""]
+        },
+        {
+            type: "list",
+            name: "newManager",
+            message: "Who is the employee's manager?",
+            choices: ["Jennifer Aniston", "Lisa Kudrow", "Courtenay Cox", "Julia Louis-Dreyfus"]
+        },
+    ]).then((response) => {
+        console.log(response);
+        promptUser();
+    })
 }
+
 exit = () => {
     console.log("Exiting the application.")
     connection.end();
 }
 
-const art = () => {
-    `___________.__
-\_   _____ / _____ ______ |  | ____ ___.__.____   ____
-    | __) _ /     \\____ \|  | /  _ <   |  |/ __ \_ / __ \ 
-     |        \  Y Y  \  | _ > >  | _(<_> )___  \  ___/\  ___/ 
-    /_______  /__|_|  /   __/|____/\____// ____|\___  >\___  >
-    \/      \/|__|               \/         \/     \/ 
-    _____                                                  
-    /     \ _____    ____ _____     ____   ___________      
-    /  \ /  \\__  \  /    \\__  \   / ___\_/ __ \_  __ \     
-    /    Y    \/ __ \|   |  \/ __ \_/ /_/  >  ___/|  | \/     
-    \____|__  (____  /___|  (____  /\___  / \___  >__|        
-    \/     \/     \/     \//_____/      \/            `
-}
-
-art();
 promptUser();
