@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const consoleTable = require("console.table");
+const cTable = require("console.table");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -15,12 +15,13 @@ connection.connect(function (err) {
     console.log("connected as id " + connection.threadId + "\n");
     // connection.query("SELECT * FROM employees", (err, res) => {
     //     if (err) throw err;
-    //     console.table(res);
-    // connection.end();
+    //     cTable(res);
+
 });
 
 const promptUser = () => {
     return inquirer.prompt([
+
         {
             type: "list",
             name: "action",
@@ -71,7 +72,7 @@ employeesByDepartment = () => {
     console.log("View all employees by department.")
     connection.query("SELECT * FROM department", (err, res) => {
         if (err) throw err;
-        console.table(res);
+        cTable(res);
         // connection.end();
         promptUser();
     });
@@ -80,7 +81,7 @@ employeesByManager = () => {
     console.log("View all employees by manager.")
     connection.query("SELECT * FROM manager", (err, res) => {
         if (err) throw err;
-        console.table(res);
+        cTable(res);
         // connection.end();
         promptUser();
     });
@@ -196,5 +197,35 @@ exit = () => {
     console.log("Exiting the application.")
     connection.end();
 }
+
+
+console.log(
+    `
+                                                                        
+                                                                        
+______   ______   ______   ______   ______   ______   ______   ______ 
+/_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/ 
+                                                                       
+                                                                       
+      ___________              .__                                     
+      \_   _____/ _____ ______ |  |   ____ ___.__. ____   ____         
+       |    __)_ /     \\____ \|  |  /  _ <   |  |/ __ \_/ __ \        
+       |        \  Y Y  \  |_> >  |_(  <_> )___  \  ___/\  ___/        
+      /_______  /__|_|  /   __/|____/\____// ____|\___  >\___  >       
+              \/      \/|__|               \/         \/     \/        
+           _____                                                       
+          /     \ _____    ____ _____     ____   ___________           
+         /  \ /  \\__  \  /    \\__  \   / ___\_/ __ \_  __ \          
+        /    Y    \/ __ \|   |  \/ __ \_/ /_/  >  ___/|  | \/          
+        \____|__  (____  /___|  (____  /\___  / \___  >__|             
+                \/     \/     \/     \//_____/      \/                 
+                                                                       
+                                                                       
+ ______   ______   ______   ______   ______   ______   ______   ______ 
+/_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/ 
+                                                                       
+                                                                    
+`
+)
 
 promptUser();
