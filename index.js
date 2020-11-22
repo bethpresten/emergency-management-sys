@@ -27,31 +27,52 @@ const promptUser = () => {
             message: "What would you like to do?",
             choices: ["View all employees", "View all employees by department", "View all employees by manager", "Add employee", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
         }
-        //         {
-        //             type: "number",
-        //             name: "id",
-        //             message: "What is your employee ID number?",
-        //         },
-        //        
-    ]).then(response => {
-        if (response.action === "View all employees") {
-            allEmployees();
-        } else if (response.action === "View all employees by department") {
-            employeesByDepartment();
-        } else if (response.action === "View all employees by manager") {
-            employeesByManager();
-        } else if (response.action === "Add employee") {
-            addEmployee();
-        } else if (response.action === "Remove employee") {
-            removeEmployee();
-        } else if (response.action === "Update employee role") {
-            updateEmployee();
-        } else if (response.action === "Update employee manager") {
-            updateManager();
-        } else if (response.action === "Exit") {
-            exit();
+    ]).then((response) => {
+        switch (response.action) {
+            case "View all employees":
+                allEmployees();
+                break;
+            case "View all employees by department":
+                employeesByDepartment();
+                break;
+            case "View all employees by manager":
+                employeesByManager();
+                break;
+            case "Add employee":
+                addEmployee();
+                break;
+            case "Remove employee":
+                removeEmployee();
+                break;
+            case "Update employee role":
+                updateEmployee();
+                break;
+            case "Update employee manager":
+                updateManager();
+                break;
+            case "Exit":
+                exit();
+                break;
         }
+        // if (response.action === "View all employees") {
+        //     allEmployees();
+        // } else if (response.action === "View all employees by department") {
+        //     employeesByDepartment();
+        // } else if (response.action === "View all employees by manager") {
+        //     employeesByManager();
+        // } else if (response.action === "Add employee") {
+        //     addEmployee();
+        // } else if (response.action === "Remove employee") {
+        //     removeEmployee();
+        // } else if (response.action === "Update employee role") {
+        //     updateEmployee();
+        // } else if (response.action === "Update employee manager") {
+        //     updateManager();
+        // } else if (response.action === "Exit") {
+        //     exit();
+        // }
     })
+
 };
 
 allEmployees = () => {
@@ -62,6 +83,7 @@ allEmployees = () => {
         // connection.end();
     });
 };
+
 employeesByDepartment = () => {
     console.log("View all employees by department.")
     connection.query("SELECT * FROM department", (err, res) => {
@@ -107,16 +129,21 @@ const addEmployee = () => {
             type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: ["", "", "", "", "", "", ""]
+            choices: ["Jennifer Aniston", "Lisa Kudrow", "Courtenay Cox", "Julia Louis-Dreyfus"]
         },
         {
             type: "number",
             name: "salary",
             message: "What is the employee's salary?",
         }
-    ]).then(response) = {
-        // write to ???  MySQL table???
-    }
+    ]).then((response) => {
+        console.log(response)
+        // connection.query("INSERT INTO employees SET ?", response, function (err, res) {
+        //     if (err) throw err;
+        //     console.log(res.affectedRows + " as a new employee!\n")
+        // })
+        connection.end();
+    });
 };
 
 removeEmployee = () => {
@@ -129,18 +156,36 @@ removeEmployee = () => {
             choices: ["", "", "", ""]
         },
     ]).then
-    // write prompt to remove employee
+    // write prompt to delete employee
 }
 
 updateEmployee = () => {
     console.log("Update the employee information")
+    // update query
 }
 updateManager = () => {
     console.log("Update the employee's manager information.")
+    //update query
 }
 exit = () => {
     console.log("Exiting the application.")
     connection.end();
 }
 
+const art = () => {
+    `___________.__
+\_   _____ / _____ ______ |  | ____ ___.__.____   ____
+    | __) _ /     \\____ \|  | /  _ <   |  |/ __ \_ / __ \ 
+     |        \  Y Y  \  | _ > >  | _(<_> )___  \  ___/\  ___/ 
+    /_______  /__|_|  /   __/|____/\____// ____|\___  >\___  >
+    \/      \/|__|               \/         \/     \/ 
+    _____                                                  
+    /     \ _____    ____ _____     ____   ___________      
+    /  \ /  \\__  \  /    \\__  \   / ___\_/ __ \_  __ \     
+    /    Y    \/ __ \|   |  \/ __ \_/ /_/  >  ___/|  | \/     
+    \____|__  (____  /___|  (____  /\___  / \___  >__|        
+    \/     \/     \/     \//_____/      \/            `
+}
+
+art();
 promptUser();
