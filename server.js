@@ -26,7 +26,7 @@ const promptUser = () => {
             type: "list",
             name: "action",
             message: "What would you like to do?",
-            choices: ["View all employees", "View all employees by department", "View all employees by manager", "Add employee", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
+            choices: ["View all employees", "View all employees by department", "View all employees by manager", "Add employee", "Add role", "Add department", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
         }
     ]).then((response) => {
         switch (response.action) {
@@ -41,6 +41,12 @@ const promptUser = () => {
                 break;
             case "Add employee":
                 addEmployee();
+                break;
+            case "Add department":
+                addDepartment();
+                break;
+            case "Add role":
+                addRole();
                 break;
             case "Remove employee":
                 removeEmployee();
@@ -132,6 +138,18 @@ const addEmployee = () => {
     });
 };
 
+addDepartment() => {
+    console.log("Adding a department.")
+
+    promptUser();
+}
+
+addRole() => {
+    console.log("Adding a role.")
+
+    promptUser();
+}
+
 removeEmployee = () => {
     console.log("Remove an employee.")
     return inquirer.prompt([
@@ -163,8 +181,8 @@ updateEmployee = () => {
             message: "What is the employee's role?",
             choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"]
         },
-    ]).then((response) => {
-        console.log(response);
+    ]).then(({ updateEmployeeRole, role }) => {
+        console.log({ updateEmployeeRole, role });
         // update query
 
         promptUser();
