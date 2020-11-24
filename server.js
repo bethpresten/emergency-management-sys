@@ -136,7 +136,7 @@ addDepartment = () => {
         {
             type: "input",
             name: "department_name",
-            message: "What is then name of the department"
+            message: "What is then name of the newly created department?"
         }
     ]).then((response) => {
         console.log(response);
@@ -147,11 +147,22 @@ addDepartment = () => {
     }).catch(err => { console.log(err) })
 }
 
-// addRole = () => {
-//     console.log("Adding a role.")
-
-//     promptUser();
-// }
+addRole = () => {
+    console.log("Adding a new role.");
+    return inquirer.prompt([
+        {
+            type: "input",
+            name: "newRole",
+            message: "What is then name of the newly created role?"
+        }
+    ]).then((response) => {
+        console.log(response);
+        connection.query(
+            `INSERT INTO role SET ?`, { title: response.newRole })
+        console.log("New role added!");
+        promptUser();
+    }).catch(err => { console.log(err) })
+}
 
 removeEmployee = () => {
     console.log("Remove an employee.")
