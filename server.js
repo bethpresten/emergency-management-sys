@@ -13,11 +13,11 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    // connection.query("SELECT * FROM employees", (err, res) => {
-    //     if (err) throw err;
-    //     cTable(res);
-
 });
+
+let allEmployeesArray = [];
+let allDepartmentsArray = ["Sales", "Finance", "Legal", "Engineering", "Human Resources", "Customer Service"];
+let allRolesArray = ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"];
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -69,7 +69,6 @@ allEmployees = () => {
     connection.query("SELECT * FROM employee", (err, res) => {
         if (err) throw err;
         console.table(res);
-        // connection.end();
         promptUser();
     });
 };
@@ -79,7 +78,6 @@ employeesByDepartment = () => {
     connection.query("SELECT * FROM department", (err, res) => {
         if (err) throw err;
         cTable(res);
-        // connection.end();
         promptUser();
     });
 };
@@ -88,7 +86,6 @@ employeesByManager = () => {
     connection.query("SELECT * FROM manager", (err, res) => {
         if (err) throw err;
         cTable(res);
-        // connection.end();
         promptUser();
     });
 };
@@ -107,15 +104,10 @@ const addEmployee = () => {
             message: "What is the employee's last name?",
         },
         {
-            type: "input",
-            name: "last_name",
-            message: "What is the employee's last name?",
-        },
-        {
             type: "list",
             name: "role",
             message: "What is the employee's role?",
-            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"]
+            choices: allRolesArray
         },
         {
             type: "list",
@@ -130,25 +122,36 @@ const addEmployee = () => {
         }
     ]).then((response) => {
         console.log(response);
-        // connection.query("INSERT INTO employees SET ?", response, function (err, res) {
-        //     if (err) throw err;
-        //     console.log(res.affectedRows + " as a new employee!\n")
-        // })
+        connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id, salary) VALUES (${response.first_name}, ${response.last_name}, ${response.role}, ${response.manager}, ${response.salary});`, function (err, res) {
+            if (err) throw err;
+            console.log("New employee added!")
+        })
         promptUser();
-    });
+    }).catch(err => { console.log(err) })
 };
 
-addDepartment() => {
-    console.log("Adding a department.")
-
-    promptUser();
+addDepartment = () => {
+    console.log("Adding a department.");
+    return inquirer.prompt([
+        {
+            type: "input",
+            name: "department_name",
+            message: "What is then name of the department"
+        }
+    ]).then((response) => {
+        console.log(response);
+        connection.query(
+            `INSERT INTO department SET ?`, { department_name: response.department_name })
+        console.log("New department added!");
+        promptUser();
+    }).catch(err => { console.log(err) })
 }
 
-addRole() => {
-    console.log("Adding a role.")
+// addRole = () => {
+//     console.log("Adding a role.")
 
-    promptUser();
-}
+//     promptUser();
+// }
 
 removeEmployee = () => {
     console.log("Remove an employee.")
@@ -156,14 +159,14 @@ removeEmployee = () => {
         {
             type: "list",
             name: "removeEmployee",
-            message: "Which employee would you like to remove?",
-            choices: ["", "", "", ""]
-        },
+            message: "Which employee would you like to remove from the system?",
+            choices: allEmployeesArray
+        }
     ]).then((response) => {
         console.log(response);
-    });
+    }).catch(err => { console.log(err) });
 };
-// write prompt to delete employee
+
 
 
 updateEmployee = () => {
@@ -179,7 +182,7 @@ updateEmployee = () => {
             type: "list",
             name: "role",
             message: "What is the employee's role?",
-            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"]
+            choices: allRolesArray
         },
     ]).then(({ updateEmployeeRole, role }) => {
         console.log({ updateEmployeeRole, role });
@@ -197,7 +200,7 @@ updateManager = () => {
             type: "list",
             name: "updateManager",
             message: "Which employee do you want to update manager information?",
-            choices: ["", "", "", ""]
+            choices: allEmployeesArray
         },
         {
             type: "list",
@@ -209,6 +212,18 @@ updateManager = () => {
         console.log(response);
         promptUser();
     })
+}
+
+renderAllEmployeeNames = () => {
+    `SELECT * CONCAT(first_name, ' ', last_name) FROM employee;
+    `,
+        function (err, res) {
+            if (err) throw err;
+            for (let i = 0; i < res.length; i++) {
+                allEmployeesArray.push(res[i]["CONCAT(first_name, ' ', last_name)"]);
+            }
+            return allEmployeesArray;
+        }
 }
 
 exit = () => {
