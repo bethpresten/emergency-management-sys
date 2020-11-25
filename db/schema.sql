@@ -47,18 +47,13 @@ JOIN employee manager on manager.id = employee.manager_id
 order by id;
 
 -- view all employees by department
-select employee.id, 
-employee.first_name, 
-employee.last_name,  
-role.title, 
-role.salary, 
-department.department_name as 'department name', 
-manager.first_name as manager from employee
-join role ON employee.role_id = role.id
-join department ON role.department_id = department.id
-JOIN employee manager on manager.id = employee.manager_id
-order by department.department_name;
-
+SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary 
+                FROM employee
+                LEFT JOIN role ON employee.role_id = role.id
+                INNER JOIN department ON role.department_id = department.id
+                WHERE department.id = ?;
+                
+                
 -- view employees by manager
 select employee.id, 
 employee.first_name, 

@@ -242,16 +242,18 @@ removeEmployee = () => {
     console.log("Remove an employee.")
     return inquirer.prompt([
         {
-            type: "list",
+            type: "input",
             name: "removeEmployee",
             message: "Which employee would you like to remove from the system?",
-            choices: allEmployeesArray
         }
     ]).then((response) => {
-        console.log(response);
-        connection.query = ``, (err, res) => {
-            if (err) throw err;
+        if (response === allEmployeesArray) {
+            connection.query = `DELETE`, (err, res) => {
+                if (err) throw err;
+            }
         }
+        console.log(response);
+
     }).catch(err => { console.log(err) });
 };
 
