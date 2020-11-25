@@ -16,8 +16,6 @@ connection.connect(function (err) {
 });
 
 let allEmployeesArray = [];
-let allDepartmentsArray = ["Sales", "Finance", "Legal", "Engineering", "Human Resources", "Customer Service"];
-let allRolesArray = ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"];
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -66,26 +64,68 @@ const promptUser = () => {
 
 allEmployees = () => {
     console.log("View all employees.")
-    connection.query("SELECT * FROM employee", (err, res) => {
+    connection.query(`select employee.id, 
+    employee.first_name, 
+    employee.last_name,  
+    role.title, 
+    role.salary, 
+    department.department_name as 'department name', 
+    manager.first_name as manager from employee
+    join role ON employee.role_id = role.id
+    join department ON role.department_id = department.id
+    JOIN employee manager on manager.id = employee.manager_id
+    order by id;`, (err, res) => {
         if (err) throw err;
         console.table(res);
         promptUser();
     });
 };
 
-employeesByDepartment = () => {
-    console.log("View all employees by department.")
-    connection.query("SELECT * FROM department", (err, res) => {
+employeesByDepartment = (departmentId) => {
+    connection.query("SELECT * FROM department;", (err, res) => {
         if (err) throw err;
-        cTable(res);
-        promptUser();
+        console.log(res);
+        const choices = res.map((row) => ({
+            value: row.id,
+            name: row.name,
+        }));
+        inquirer
+            .prompt({
+                type: "list",
+                message: "Which department do you want to look at?",
+                name: "department",
+                choices: choices,
+            })
+            .then((response) => {
+                console.log(response);
+                connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary 
+                FROM employee
+                LEFT JOIN role ON employee.role_id = role.id
+                INNER JOIN department ON role.department_id = department.id
+                WHERE department.id = ${response.department}`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    promptUser();
+                });
+            });
     });
-};
+}
+
 employeesByManager = () => {
     console.log("View all employees by manager.")
-    connection.query("SELECT * FROM manager", (err, res) => {
+    connection.query(`select employee.id, 
+    employee.first_name, 
+    employee.last_name,  
+    role.title, 
+    role.salary, 
+    department.department_name as 'department name', 
+    manager.first_name as manager from employee
+    join role ON employee.role_id = role.id
+    join department ON role.department_id = department.id
+    JOIN employee manager on manager.id = employee.manager_id
+    order by employee.manager_id;`, (err, res) => {
         if (err) throw err;
-        cTable(res);
+        console.table(res);
         promptUser();
     });
 };
@@ -105,27 +145,28 @@ const addEmployee = () => {
         },
         {
             type: "list",
-            name: "role",
+            name: "role_id",
             message: "What is the employee's role?",
-            choices: allRolesArray
+            choices: viewAllRoles(),
         },
         {
             type: "list",
-            name: "manager",
+            name: "manager_id",
             message: "Who is the employee's manager?",
             choices: ["Jennifer Aniston", "Lisa Kudrow", "Courtenay Cox", "Julia Louis-Dreyfus"]
         },
-        {
-            type: "number",
-            name: "salary",
-            message: "What is the employee's salary?",
-        }
     ]).then((response) => {
         console.log(response);
-        connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id, salary) VALUES (${response.first_name}, ${response.last_name}, ${response.role}, ${response.manager}, ${response.salary});`, function (err, res) {
-            if (err) throw err;
-            console.log("New employee added!")
-        })
+        connection.query(`INSERT INTO employee SET ?`,
+            {
+                first_name: response.first_name,
+                last_name: response.last_name,
+                role_id: response.role_id,
+                manager_id: response.manager_id
+            }, function (err, res) {
+                if (err) throw err;
+                console.log("New employee added!")
+            })
         promptUser();
     }).catch(err => { console.log(err) })
 };
@@ -137,7 +178,7 @@ addDepartment = () => {
             type: "input",
             name: "department_name",
             message: "What is then name of the newly created department?"
-        }
+        },
     ]).then((response) => {
         console.log(response);
         connection.query(
@@ -153,15 +194,48 @@ addRole = () => {
         {
             type: "input",
             name: "newRole",
-            message: "What is then name of the newly created role?"
+            message: "What is the name of the newly created role?"
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "What is the salary for this position?"
+        },
+        {
+            type: "input",
+            name: "allDepartmentChoices",
+            message: chooseDepartment()
         }
     ]).then((response) => {
         console.log(response);
         connection.query(
-            `INSERT INTO role SET ?`, { title: response.newRole })
+            `INSERT INTO role SET ?`, { title: response.newRole, salary: response.salary, department_id: response.allDepartmentChoices })
         console.log("New role added!");
         promptUser();
     }).catch(err => { console.log(err) })
+}
+
+function viewAllRoles() {
+    let allRolesArray = ["engineer", "attorney", "accountant", "sales"];
+    connection.query("SELECT title FROM role", (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            allRolesArray.push(res[i].title);
+        }
+    });
+    return allRolesArray;
+}
+
+
+chooseDepartment = () => {
+    let allDepartmentsArray = ["sales", "finance", "engineering", "legal"];
+    connection.query("SELECT department_name FROM department", (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            allDepartmentsArray.push(res[i].name);
+        }
+    });
+    return allDepartmentsArray;
 }
 
 removeEmployee = () => {
@@ -175,6 +249,9 @@ removeEmployee = () => {
         }
     ]).then((response) => {
         console.log(response);
+        connection.query = ``, (err, res) => {
+            if (err) throw err;
+        }
     }).catch(err => { console.log(err) });
 };
 
