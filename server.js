@@ -24,12 +24,18 @@ const promptUser = () => {
             type: "list",
             name: "action",
             message: "What would you like to do?",
-            choices: ["View all employees", "View all employees by department", "View all employees by manager", "Add employee", "Add role", "Add department", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
+            choices: ["View all employees", "View all roles", "View all departments", "View all employees by department", "View all employees by manager", "Add employee", "Add role", "Add department", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
         }
     ]).then((response) => {
         switch (response.action) {
             case "View all employees":
                 allEmployees();
+                break;
+            case "View all roles":
+                viewRoles();
+                break;
+            case "View all departments":
+                viewDepartments();
                 break;
             case "View all employees by department":
                 employeesByDepartment();
@@ -81,11 +87,28 @@ allEmployees = () => {
     });
 };
 
+viewRoles = () => {
+    console.log("View all roles.")
+    connection.query(`SELECT * FROM role`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        promptUser();
+    });
+};
+
+viewDepartments = () => {
+    console.log("View all departments.")
+    connection.query(`SELECT * FROM department`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        promptUser();
+    });
+};
 employeesByDepartment = (departmentId) => {
     connection.query("SELECT * FROM department;", (err, res) => {
         if (err) throw err;
         console.log(res);
-        const choices = res.map((row) => ({
+        const departmentChoices = res.map((row) => ({
             value: row.id,
             name: row.name,
         }));
@@ -94,7 +117,7 @@ employeesByDepartment = (departmentId) => {
                 type: "list",
                 message: "Which department do you want to look at?",
                 name: "department",
-                choices: choices,
+                choices: departmentChoices,
             })
             .then((response) => {
                 console.log(response);
@@ -132,43 +155,57 @@ employeesByManager = () => {
 
 const addEmployee = () => {
     console.log("Adding a new employee.")
-    return inquirer.prompt([
-        {
-            type: "input",
-            name: "first_name",
-            message: "What is the employee's first name?",
-        },
-        {
-            type: "input",
-            name: "last_name",
-            message: "What is the employee's last name?",
-        },
-        {
-            type: "list",
-            name: "role_id",
-            message: "What is the employee's role?",
-            choices: viewAllRoles(),
-        },
-        {
-            type: "list",
-            name: "manager_id",
-            message: "Who is the employee's manager?",
-            choices: ["Jennifer Aniston", "Lisa Kudrow", "Courtenay Cox", "Julia Louis-Dreyfus"]
-        },
-    ]).then((response) => {
-        console.log(response);
-        connection.query(`INSERT INTO employee SET ?`,
+    connection.query("SELECT * FROM department;", (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        const departmentChoices = res.map((row) => ({
+            value: row.id,
+            name: row.name,
+        }));
+        return inquirer.prompt([
             {
-                first_name: response.first_name,
-                last_name: response.last_name,
-                role_id: response.role_id,
-                manager_id: response.manager_id
-            }, function (err, res) {
-                if (err) throw err;
-                console.log("New employee added!")
-            })
-        promptUser();
-    }).catch(err => { console.log(err) })
+                type: "input",
+                name: "first_name",
+                message: "What is the employee's first name?",
+            },
+            {
+                type: "input",
+                name: "last_name",
+                message: "What is the employee's last name?",
+            },
+            {
+                type: "list",
+                name: "role_id",
+                message: "What is the employee's role?",
+                choices: viewAllRoles(),
+            },
+            {
+                type: "list",
+                name: "manager_id",
+                message: "Who is the employee's manager?",
+                choices: ["Jennifer Aniston", "Lisa Kudrow", "Courtenay Cox", "Julia Louis-Dreyfus"]
+            },
+            {
+                type: "list",
+                name: "whichDepartment",
+                message: "What department is the employee in?",
+                choices: departmentChoices,
+            },
+        ]).then((response) => {
+            console.log(response);
+            connection.query(`INSERT INTO employee SET ?`,
+                {
+                    first_name: response.first_name,
+                    last_name: response.last_name,
+                    role_id: response.role_id,
+                    manager_id: response.manager_id
+                }, function (err, res) {
+                    if (err) throw err;
+                    console.log("New employee added!")
+                })
+            promptUser();
+        }).catch(err => { console.log(err) })
+    });
 };
 
 addDepartment = () => {
@@ -324,30 +361,30 @@ exit = () => {
 
 console.log(
     `
-                                                                        
-                                                                        
-______   ______   ______   ______   ______   ______   ______   ______ 
-/_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/ 
-                                                                       
-                                                                       
-      ___________              .__                                     
-      \_   _____/ _____ ______ |  |   ____ ___.__. ____   ____         
-       |    __)_ /     \\____ \|  |  /  _ <   |  |/ __ \_/ __ \        
-       |        \  Y Y  \  |_> >  |_(  <_> )___  \  ___/\  ___/        
-      /_______  /__|_|  /   __/|____/\____// ____|\___  >\___  >       
-              \/      \/|__|               \/         \/     \/        
-           _____                                                       
-          /     \ _____    ____ _____     ____   ___________           
-         /  \ /  \\__  \  /    \\__  \   / ___\_/ __ \_  __ \          
-        /    Y    \/ __ \|   |  \/ __ \_/ /_/  >  ___/|  | \/          
-        \____|__  (____  /___|  (____  /\___  / \___  >__|             
-                \/     \/     \/     \//_____/      \/                 
-                                                                       
-                                                                       
- ______   ______   ______   ______   ______   ______   ______   ______ 
-/_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/ 
-                                                                       
-                                                                    
+                                                                                
+                                                                                 
+    ______   ______   ______   ______   ______   ______   ______   ______   ______ 
+    /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/ 
+                                                                                    
+                                                                                    
+       ___________                    .__                                           
+       \_   _____/   _____   ______   |  |     ____    ___.__.   ____     ____      
+        |    __)_   /     \  \____ \  |  |    /  _ \  <   |  | _/ __ \  _/ __ \     
+        |        \ |  Y Y  \ |  |_> > |  |__ (  <_> )  \___  | \  ___/  \  ___/     
+       /_______  / |__|_|  / |   __/  |____/  \____/   / ____|  \___  >  \___  >    
+               \/        \/  |__|                      \/           \/       \/     
+             _____                                                                  
+            /     \   _____      ____   _____       ____     ____   _______         
+           /  \ /  \  \__  \    /    \  \__  \     / ___\  _/ __ \  \_  __ \        
+          /    Y    \  / __ \_ |   |  \  / __ \_  / /_/  > \  ___/   |  | \/        
+          \____|__  / (____  / |___|  / (____  /  \___  /   \___  >  |__|           
+                  \/       \/       \/       \/  /_____/        \/                  
+                                                                                    
+                                                                                    
+     ______   ______   ______   ______   ______   ______   ______   ______   ______ 
+    /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/  /_____/ 
+                                                                                    
+                                                                                                                                                     
 `
 )
 

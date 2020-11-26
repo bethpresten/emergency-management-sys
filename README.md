@@ -37,7 +37,7 @@ The code uses inquirer, MySql, and node. Run "node server.js" from your command 
 
 ### Contributors
 
-The application was completed by Beth Presten. Contributors include Peter Collela, TA and Crystal Kelley, TA for clarifying questions and my classmates for helping to clarify cloudy concepts.
+The application was completed by Beth Presten. Contributors include Peter Collela, TA and Crystal Kelley, TA for clarifying questions and my classmates for helping to clarify cloudy concepts. http://patorjk.com/ was the source for the ascii art.
 
 ### License
 
