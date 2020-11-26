@@ -31,7 +31,7 @@ https://github.com/bethpresten/employee-management-sys
 
 ### Usage
 
-![readmedemo](assets/employeemanagement.gif)
+![readmedemo](assets/employeemanager.gif)
 
 The code uses inquirer, MySql, and node. Run "node server.js" from your command line after changing into the correct directory. Follow the prompts from there. Check for a comprehensive list of all employees by "viewing all employees" after adding employees, roles, departments.
 
