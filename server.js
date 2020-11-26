@@ -1,7 +1,9 @@
+// requiring mysql to pull queries
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 
+// requiring the mysql connection
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -10,13 +12,14 @@ const connection = mysql.createConnection({
     database: "employees_db"
 });
 
+// establishing the connection
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
 });
 
 let allEmployeesArray = [];
-
+// basic function for the main menu
 const promptUser = () => {
     return inquirer.prompt([
 
@@ -26,48 +29,50 @@ const promptUser = () => {
             message: "What would you like to do?",
             choices: ["View all employees", "View all roles", "View all departments", "View all employees by department", "View all employees by manager", "Add employee", "Add role", "Add department", "Remove employee", "Update employee role", "Update employee manager", "Exit"]
         }
-    ]).then((response) => {
-        switch (response.action) {
-            case "View all employees":
-                allEmployees();
-                break;
-            case "View all roles":
-                viewRoles();
-                break;
-            case "View all departments":
-                viewDepartments();
-                break;
-            case "View all employees by department":
-                employeesByDepartment();
-                break;
-            case "View all employees by manager":
-                employeesByManager();
-                break;
-            case "Add employee":
-                addEmployee();
-                break;
-            case "Add department":
-                addDepartment();
-                break;
-            case "Add role":
-                addRole();
-                break;
-            case "Remove employee":
-                removeEmployee();
-                break;
-            case "Update employee role":
-                updateEmployee();
-                break;
-            case "Update employee manager":
-                updateManager();
-                break;
-            case "Exit":
-                exit();
-                break;
-        }
-    })
+    ])
+        // offering conditionals for each choice
+        .then((response) => {
+            switch (response.action) {
+                case "View all employees":
+                    allEmployees();
+                    break;
+                case "View all roles":
+                    viewRoles();
+                    break;
+                case "View all departments":
+                    viewDepartments();
+                    break;
+                case "View all employees by department":
+                    employeesByDepartment();
+                    break;
+                case "View all employees by manager":
+                    employeesByManager();
+                    break;
+                case "Add employee":
+                    addEmployee();
+                    break;
+                case "Add department":
+                    addDepartment();
+                    break;
+                case "Add role":
+                    addRole();
+                    break;
+                case "Remove employee":
+                    removeEmployee();
+                    break;
+                case "Update employee role":
+                    updateEmployee();
+                    break;
+                case "Update employee manager":
+                    updateManager();
+                    break;
+                case "Exit":
+                    exit();
+                    break;
+            }
+        })
 };
-
+//viewing all employees with a triple join of 3 tables
 allEmployees = () => {
     console.log("View all employees.")
     connection.query(`select employee.id, 
@@ -86,7 +91,7 @@ allEmployees = () => {
         promptUser();
     });
 };
-
+// viewing all roles just from the role table
 viewRoles = () => {
     console.log("View all roles.")
     connection.query(`SELECT * FROM role`, (err, res) => {
@@ -96,6 +101,7 @@ viewRoles = () => {
     });
 };
 
+// viewing all departments with a basic table query
 viewDepartments = () => {
     console.log("View all departments.")
     connection.query(`SELECT * FROM department`, (err, res) => {
@@ -104,6 +110,8 @@ viewDepartments = () => {
         promptUser();
     });
 };
+
+// viewing all employees by department// having the functionality to choose based on a menu
 employeesByDepartment = (departmentId) => {
     connection.query("SELECT * FROM department;", (err, res) => {
         if (err) throw err;
@@ -134,6 +142,7 @@ employeesByDepartment = (departmentId) => {
     });
 }
 
+// viewing all employees and sorted by their manager
 employeesByManager = () => {
     console.log("View all employees by manager.")
     connection.query(`select employee.id, 
@@ -152,17 +161,21 @@ employeesByManager = () => {
         promptUser();
     });
 };
-
+// adding employee functionality
 const addEmployee = () => {
     console.log("Adding a new employee.")
+    // empty object for the employee to get pushed into
     let addNewEmployee = {};
     connection.query("SELECT * FROM role", (err, res) => {
         if (err) throw err;
         console.log(res);
+        // defining the choices for ease of picking
         const departmentChoices = res.map((row) => ({
             value: row.id,
             name: row.name,
         }));
+
+        // questions for adding a new employee
         return inquirer.prompt([
             {
                 type: "input",
@@ -246,7 +259,7 @@ const addEmployee = () => {
         }).catch(err => { console.log(err) })
     });
 };
-
+// adding new departments
 addDepartment = () => {
     console.log("Adding a department.");
     return inquirer.prompt([
@@ -263,7 +276,7 @@ addDepartment = () => {
         promptUser();
     }).catch(err => { console.log(err) })
 }
-
+// adding new roles
 addRole = () => {
     console.log("Adding a new role.");
     connection.query("SELECT * FROM department;", (err, res) => {
@@ -300,7 +313,7 @@ addRole = () => {
     })
 }
 
-
+// functionality that I couldn't get to work
 removeEmployee = () => {
     console.log("Remove an employee.")
     return inquirer.prompt([
@@ -321,7 +334,7 @@ removeEmployee = () => {
 };
 
 
-
+// functionality that I couldn't get to work
 updateEmployee = () => {
     console.log("Update the employee information")
     return inquirer.prompt([
@@ -345,7 +358,7 @@ updateEmployee = () => {
 
     })
 }
-
+// functionality that I couldn't get to work
 updateManager = () => {
     console.log("Update the employee's manager information.")
     return inquirer.prompt([
@@ -367,24 +380,13 @@ updateManager = () => {
     })
 }
 
-renderAllEmployeeNames = () => {
-    `SELECT * CONCAT(first_name, ' ', last_name) FROM employee;
-    `,
-        function (err, res) {
-            if (err) throw err;
-            for (let i = 0; i < res.length; i++) {
-                allEmployeesArray.push(res[i]["CONCAT(first_name, ' ', last_name)"]);
-            }
-            return allEmployeesArray;
-        }
-}
-
+// ending the connection to exit the application
 exit = () => {
     console.log("Exiting the application.")
     connection.end();
 }
 
-
+// ascii art courtesy of my cited source 
 console.log(
     `
                                                                                 
